@@ -5,8 +5,8 @@ const pool = require('../config/db');
 const CategoryModel = {
   // Crearea unei noi categorii
   create: async (name, description) => {
-    const query = 'INSERT INTO Categories (name, description) VALUES ($1, $2) RETURNING *;';
-    const values = [name, description];
+    const query = 'INSERT INTO Categories (name, description, master_category) VALUES ($1, $2, $3) RETURNING *;';
+    const values = [name, description, master_category];
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
@@ -40,8 +40,8 @@ const CategoryModel = {
 
   // Actualizarea unei categorii prin ID
   update: async (id, name, description) => {
-    const query = 'UPDATE Categories SET name = $1, description = $2 WHERE id = $3 RETURNING *;';
-    const values = [name, description, id];
+    const query = 'UPDATE Categories SET name = $1, description = $2, master_category=$3 WHERE id = $4 RETURNING *;';
+    const values = [name, description, master_category, id];
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
