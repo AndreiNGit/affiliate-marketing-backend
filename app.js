@@ -11,6 +11,7 @@ const advertiserProductRoutes = require('./routes/advertiserProduct.routes');
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
 const commentRoutes = require('./routes/comment.routes');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 
@@ -18,13 +19,16 @@ const app = express();
 app.use(bodyParser.json());
 
 // Define routes
+app.use('/api/users', userRoutes);
+
+app.use(authMiddleware)
+
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/category-products', categoryProductRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/advertisers', advertiserRoutes);
 app.use('/api/advertiser-products', advertiserProductRoutes);
-app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 

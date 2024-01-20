@@ -1,74 +1,69 @@
-// models/post.model.js
-
 const pool = require('../config/db');
 
-const PostModel = {
-  // Crearea unui nou post
-  create: async ({ title, slug, content, description, is_draft, is_private, password, author }) => {
-    const query = `
-      INSERT INTO Post (title, slug, content, description, is_draft, is_private, password, author) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
-    `;
-    const values = [title, slug, content, description, is_draft, is_private, password, author];
-    try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Citirea tuturor postărilor
+module.exports = {
   findAll: async () => {
-    const query = 'SELECT * FROM Post;';
+    const query = 'SELECT * FROM affiliate_network.posts;';
     try {
       const result = await pool.query(query);
       return result.rows;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Citirea unei postări prin ID
   findById: async (id) => {
-    const query = 'SELECT * FROM Post WHERE id = $1;';
-    const values = [id];
+    const query = {
+      text: 'SELECT * FROM affiliate_network.posts WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Actualizarea unei postări prin ID
-  update: async (id, { title, slug, content, description, is_draft, is_private, password, author }) => {
-    const query = `
-      UPDATE Post 
-      SET title = $1, slug = $2, content = $3, description = $4, 
-          is_draft = $5, is_private = $6, password = $7, author = $8 
-      WHERE id = $9 RETURNING *;
-    `;
-    const values = [title, slug, content, description, is_draft, is_private, password, author, id];
+  create: async (title, slug, content, is_draft, is_private, date, password, modified, author) => {
+    const query = {
+      text: 'INSERT INTO affiliate_network.posts(title, slug, content, is_draft, is_private, date, password, modified, author) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;',
+      values: [title, slug, content, is_draft, is_private, date, password, modified, author],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Ștergerea unei postări prin ID
+  update: async (id, title, slug, content, is_draft, is_private, date, password, modified, author) => {
+    const query = {
+      text: 'UPDATE affiliate_network.posts SET title = $2, slug = $3, content = $4, is_draft = $5, is_private = $6, date = $7, password = $8, modified = $9, author = $10 WHERE id = $1 RETURNING *;',
+      values: [id, title, slug, content, is_draft, is_private, date, password, modified, author],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
   delete: async (id) => {
-    const query = 'DELETE FROM Post WHERE id = $1 RETURNING *;';
-    const values = [id];
+    const query = {
+      text: 'DELETE FROM affiliate_network.posts WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
+      await pool.query(query);
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-  },
+  }
 };
-
-module.exports = PostModel;

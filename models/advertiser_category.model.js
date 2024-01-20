@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 module.exports = {
   findAll: async () => {
-    const query = 'SELECT * FROM affiliate_network.advertisers;';
+    const query = 'SELECT * FROM affiliate_network.advertiser_categories;';
     try {
       const result = await pool.query(query);
       return result.rows;
@@ -14,7 +14,7 @@ module.exports = {
 
   findById: async (id) => {
     const query = {
-      text: 'SELECT * FROM affiliate_network.advertisers WHERE id = $1;',
+      text: 'SELECT * FROM affiliate_network.advertiser_categories WHERE id = $1;',
       values: [id],
     };
     try {
@@ -26,10 +26,10 @@ module.exports = {
     }
   },
 
-  create: async (name, feed, description, logo_path) => {
+  create: async (name, advertisersId) => {
     const query = {
-      text: 'INSERT INTO affiliate_network.advertisers(name, feed, description, logo_path) VALUES($1, $2, $3, $4) RETURNING *;',
-      values: [name, feed, description, logo_path],
+      text: 'INSERT INTO affiliate_network.advertiser_categories(name, advertisersid) VALUES($1, $2) RETURNING *;',
+      values: [name, advertisersId],
     };
     try {
       const result = await pool.query(query);
@@ -40,10 +40,10 @@ module.exports = {
     }
   },
 
-  update: async (id, name, feed, description, logo_path) => {
+  update: async (id, name, advertisersId) => {
     const query = {
-      text: 'UPDATE affiliate_network.advertisers SET name = $2, feed = $3, description = $4, logo_path = $5 WHERE id = $1 RETURNING *;',
-      values: [id, name, feed, description, logo_path],
+      text: 'UPDATE affiliate_network.advertiser_categories SET name = $2, advertisersid = $3 WHERE id = $1 RETURNING *;',
+      values: [id, name, advertisersId],
     };
     try {
       const result = await pool.query(query);
@@ -56,7 +56,7 @@ module.exports = {
 
   delete: async (id) => {
     const query = {
-      text: 'DELETE FROM affiliate_network.advertisers WHERE id = $1;',
+      text: 'DELETE FROM affiliate_network.advertiser_categories WHERE id = $1;',
       values: [id],
     };
     try {

@@ -1,66 +1,69 @@
-// models/category.model.js
-
 const pool = require('../config/db');
 
-const CategoryModel = {
-  // Crearea unei noi categorii
-  create: async (name, description) => {
-    const query = 'INSERT INTO Categories (name, description, master_category) VALUES ($1, $2, $3) RETURNING *;';
-    const values = [name, description, master_category];
-    try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Citirea tuturor categoriilor
+module.exports = {
   findAll: async () => {
-    const query = 'SELECT * FROM Categories;';
+    const query = 'SELECT * FROM affiliate_network.categories;';
     try {
       const result = await pool.query(query);
       return result.rows;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Citirea unei singure categorii prin ID
   findById: async (id) => {
-    const query = 'SELECT * FROM Categories WHERE id = $1;';
-    const values = [id];
+    const query = {
+      text: 'SELECT * FROM affiliate_network.categories WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Actualizarea unei categorii prin ID
-  update: async (id, name, description) => {
-    const query = 'UPDATE Categories SET name = $1, description = $2, master_category=$3 WHERE id = $4 RETURNING *;';
-    const values = [name, description, master_category, id];
+  create: async (name, description, master_category) => {
+    const query = {
+      text: 'INSERT INTO affiliate_network.categories(name, description, master_category) VALUES($1, $2, $3) RETURNING *;',
+      values: [name, description, master_category],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Ștergerea unei categorii prin ID
+  update: async (id, name, description, master_category) => {
+    const query = {
+      text: 'UPDATE affiliate_network.categories SET name = $2, description = $3, master_category = $4 WHERE id = $1 RETURNING *;',
+      values: [id, name, description, master_category],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
   delete: async (id) => {
-    const query = 'DELETE FROM Categories WHERE id = $1 RETURNING *;';
-    const values = [id];
+    const query = {
+      text: 'DELETE FROM affiliate_network.categories WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
+      await pool.query(query);
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-  },
+  }
 };
-
-module.exports = CategoryModel;

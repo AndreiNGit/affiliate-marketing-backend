@@ -1,73 +1,97 @@
-// models/product.model.js
-
 const pool = require('../config/db');
 
-const ProductModel = {
-  // Crearea unui nou produs
-  create: async ({ title, description, short_description, link, image_path }) => {
-    const query = `
-      INSERT INTO Products (title, description, short_description, link, image_path) 
-      VALUES ($1, $2, $3, $4, $5) RETURNING *;
-    `;
-    const values = [title, description, short_description, link, image_path];
-    try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Citirea tuturor produselor
+module.exports = {
   findAll: async () => {
-    const query = 'SELECT * FROM Products;';
+    const query = 'SELECT * FROM affiliate_network.products;';
     try {
       const result = await pool.query(query);
       return result.rows;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Citirea unui singur produs prin ID
   findById: async (id) => {
-    const query = 'SELECT * FROM Products WHERE id = $1;';
-    const values = [id];
+    const query = {
+      text: 'SELECT * FROM affiliate_network.products WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Actualizarea unui produs prin ID
-  update: async (id, { title, description, short_description, link, image_path }) => {
-    const query = `
-      UPDATE Products 
-      SET title = $1, description = $2, short_description = $3, link = $4, image_path = $5 
-      WHERE id = $6 RETURNING *;
-    `;
-    const values = [title, description, short_description, link, image_path, id];
+  findByCategory: async (category_id) => {
+    const query = {
+      text: 'SELECT * FROM affiliate_network.products WHERE category_id = $1;',
+      values: [category_id],
+    };
     try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
+      const result = await pool.query(query);
+      return result.rows;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Ștergerea unui produs prin ID
+  findByAdvertiser: async (advertiser_id) => {
+    const query = {
+      text: 'SELECT * FROM affiliate_network.products WHERE advertiser_id = $1;',
+      values: [advertiser_id],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
+  create: async (title, description, short_description, link, image_path) => {
+    const query = {
+      text: 'INSERT INTO affiliate_network.products(title, description, short_description, link, image_path) VALUES($1, $2, $3, $4, $5) RETURNING *;',
+      values: [title, description, short_description, link, image_path],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
+  update: async (id, title, description, short_description, link, image_path) => {
+    const query = {
+      text: 'UPDATE affiliate_network.products SET title = $2, description = $3, short_description = $4, link = $5, image_path = $6 WHERE id = $1 RETURNING *;',
+      values: [id, title, description, short_description, link, image_path],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
   delete: async (id) => {
-    const query = 'DELETE FROM Products WHERE id = $1 RETURNING *;';
-    const values = [id];
+    const query = {
+      text: 'DELETE FROM affiliate_network.products WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
+      await pool.query(query);
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-  },
+  }
 };
-
-module.exports = ProductModel;

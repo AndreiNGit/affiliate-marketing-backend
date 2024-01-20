@@ -1,75 +1,69 @@
-// models/comment.model.js
-
 const pool = require('../config/db');
 
-const CommentModel = {
-  // Crearea unui nou comentariu
-  create: async ({ content, author, author_ip, post_id, comment_parent }) => {
-    const query = `
-      INSERT INTO Comments (content, author, author_ip, post_id, comment_parent, approved, date)
-      VALUES ($1, $2, $3, $4, $5, false, NOW()) RETURNING *;
-    `;
-    // Presupunem că toate comentariile noi nu sunt aprobate inițial (approved = false)
-    const values = [content, author, author_ip, post_id, comment_parent];
-    try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Citirea tuturor comentariilor
+module.exports = {
   findAll: async () => {
-    const query = 'SELECT * FROM Comments;';
+    const query = 'SELECT * FROM affiliate_network.comments;';
     try {
       const result = await pool.query(query);
       return result.rows;
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Citirea unui comentariu prin ID
   findById: async (id) => {
-    const query = 'SELECT * FROM Comments WHERE id = $1;';
-    const values = [id];
+    const query = {
+      text: 'SELECT * FROM affiliate_network.comments WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Actualizarea unui comentariu prin ID
-  update: async (id, { content, approved }) => {
-    const query = `
-      UPDATE Comments 
-      SET content = $1, approved = $2, date = NOW()
-      WHERE id = $3 RETURNING *;
-    `;
-    // Actualizarea conținutului comentariului și a stării de aprobare, data actualizării este setată la momentul curent
-    const values = [content, approved, id];
+  create: async (content, author, author_ip, date, approved, comment_parent, postid) => {
+    const query = {
+      text: 'INSERT INTO affiliate_network.comments(content, author, author_ip, date, approved, comment_parent, postid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *;',
+      values: [content, author, author_ip, date, approved, comment_parent, postid],
+    };
     try {
-      const result = await pool.query(query, values);
+      const result = await pool.query(query);
       return result.rows[0];
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
   },
 
-  // Ștergerea unui comentariu prin ID
+  update: async (id, content, author, author_ip, date, approved, comment_parent, postid) => {
+    const query = {
+      text: 'UPDATE affiliate_network.comments SET content = $2, author = $3, author_ip = $4, date = $5, approved = $6, comment_parent = $7, postid = $8 WHERE id = $1 RETURNING *;',
+      values: [id, content, author, author_ip, date, approved, comment_parent, postid],
+    };
+    try {
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
   delete: async (id) => {
-    const query = 'DELETE FROM Comments WHERE id = $1 RETURNING *;';
-    const values = [id];
+    const query = {
+      text: 'DELETE FROM affiliate_network.comments WHERE id = $1;',
+      values: [id],
+    };
     try {
-      const result = await pool.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      throw error;
+      await pool.query(query);
+    } catch (err) {
+      console.error(err);
+      throw err;
     }
-  },
+  }
 };
-
-module.exports = CommentModel;
